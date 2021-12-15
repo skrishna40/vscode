@@ -532,11 +532,7 @@ export class BrowserTerminalProfileResolverService extends BaseTerminalProfileRe
 					return backend.getDefaultSystemShell(os);
 				},
 				getEnvironment: async (remoteAuthority) => {
-					const backend = terminalInstanceService.getBackend(remoteAuthority);
-					if (!remoteAuthority || !backend) {
-						return env;
-					}
-					return backend.getEnvironment();
+					return env;
 				}
 			},
 			configurationService,
