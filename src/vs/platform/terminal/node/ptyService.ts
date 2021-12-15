@@ -19,7 +19,7 @@ import { Terminal as XtermTerminal } from 'xterm-headless';
 import type { ISerializeOptions, SerializeAddon as XtermSerializeAddon } from 'xterm-addon-serialize';
 import type { Unicode11Addon as XtermUnicode11Addon } from 'xterm-addon-unicode11';
 import { IGetTerminalLayoutInfoArgs, IProcessDetails, IPtyHostProcessReplayEvent, ISetTerminalLayoutInfoArgs, ITerminalTabLayoutInfoDto } from 'vs/platform/terminal/common/terminalProcess';
-import { getWindowsBuildNumber } from 'vs/platform/terminal/node/terminalEnvironment';
+import { createTerminalEnvironment, getWindowsBuildNumber } from 'vs/platform/terminal/node/terminalEnvironment';
 import { TerminalProcess } from 'vs/platform/terminal/node/terminalProcess';
 import { localize } from 'vs/nls';
 import { ignoreProcessNames } from 'vs/platform/terminal/node/childProcessMonitor';
@@ -141,6 +141,14 @@ export class PtyService extends Disposable implements IPtyService {
 				key: 'terminal-session-restore',
 				comment: ['date the snapshot was taken', 'time the snapshot was taken']
 			}, "Session contents restored from {0} at {1}", new Date(state.timestamp).toLocaleDateString(dateTimeFormatLocate), new Date(state.timestamp).toLocaleTimeString(dateTimeFormatLocate));
+			const env = createTerminalEnvironment(
+				state.shellLaunchConfig,
+				{},
+				undefined,
+				'1',
+				'auto',
+				{ ...process.env }
+			);
 			const newId = await this.createProcess(
 				{
 					...state.shellLaunchConfig,
@@ -154,7 +162,7 @@ export class PtyService extends Disposable implements IPtyService {
 				state.replayEvent.events[0].cols,
 				state.replayEvent.events[0].rows,
 				state.unicodeVersion,
-				state.processLaunchOptions.env,
+				env,
 				state.processLaunchOptions.executableEnv,
 				state.processLaunchOptions.windowsEnableConpty,
 				true,

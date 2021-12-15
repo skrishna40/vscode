@@ -29,6 +29,7 @@ import { AbstractVariableResolverService } from 'vs/workbench/services/configura
 import { buildUserEnvironment } from 'vs/server/extensionHostConnection';
 import { IServerEnvironmentService } from 'vs/server/serverEnvironmentService';
 import { IProductService } from 'vs/platform/product/common/productService';
+import { createTerminalEnvironment } from 'vs/platform/terminal/node/terminalEnvironment';
 
 class CustomVariableResolver extends AbstractVariableResolverService {
 	constructor(
@@ -211,7 +212,7 @@ export class RemoteTerminalChannel extends Disposable implements IServerChannel<
 
 		const envPlatformKey = platform.isWindows ? 'terminal.integrated.env.windows' : (platform.isMacintosh ? 'terminal.integrated.env.osx' : 'terminal.integrated.env.linux');
 		const envFromConfig = args.configuration[envPlatformKey];
-		const env = terminalEnvironment.createTerminalEnvironment(
+		const env = createTerminalEnvironment(
 			shellLaunchConfig,
 			envFromConfig,
 			variableResolver,
