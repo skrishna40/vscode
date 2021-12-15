@@ -132,6 +132,7 @@ export interface ITerminalBackend {
 		unicodeVersion: '6' | '11',
 		env: IProcessEnvironment,
 		windowsEnableConpty: boolean,
+		inheritProcessEnv: string[],
 		shouldPersist: boolean
 	): Promise<ITerminalChildProcess>;
 }
@@ -267,9 +268,11 @@ export interface ITerminalConfiguration {
 	persistentSessionReviveProcess: 'onExit' | 'onExitAndWindowClose' | 'never';
 	ignoreProcessNames: string[];
 	autoReplies: { [key: string]: string };
+	inheritEnvOnRestore: string[];
 }
 
 export const DEFAULT_LOCAL_ECHO_EXCLUDE: ReadonlyArray<string> = ['vim', 'vi', 'nano', 'tmux'];
+export const DEFAULT_INHERIT_ENV: ReadonlyArray<string> = ['SSH_AUTH_SOCK'];
 
 export interface ITerminalConfigHelper {
 	config: ITerminalConfiguration;

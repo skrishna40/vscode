@@ -246,6 +246,7 @@ export class TerminalProcessManager extends Disposable implements ITerminalProce
 							this._configHelper.config.unicodeVersion,
 							{}, // TODO: Fix env
 							true, // TODO: Fix enable
+							this._configHelper.config.inheritEnvOnRestore,
 							shouldPersist
 						);
 					} catch (e) {
@@ -409,7 +410,7 @@ export class TerminalProcessManager extends Disposable implements ITerminalProce
 
 		const useConpty = this._configHelper.config.windowsEnableConpty && !isScreenReaderModeEnabled;
 		const shouldPersist = this._configHelper.config.enablePersistentSessions && !shellLaunchConfig.isFeatureTerminal;
-		return await backend.createProcess(shellLaunchConfig, initialCwd, cols, rows, this._configHelper.config.unicodeVersion, env, useConpty, shouldPersist);
+		return await backend.createProcess(shellLaunchConfig, initialCwd, cols, rows, this._configHelper.config.unicodeVersion, env, useConpty, this._configHelper.config.inheritEnvOnRestore, shouldPersist);
 	}
 
 	private _setupPtyHostListeners(backend: ITerminalBackend) {

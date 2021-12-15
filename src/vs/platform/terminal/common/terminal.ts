@@ -102,6 +102,7 @@ export const enum TerminalSettingId {
 	ShowLinkHover = 'terminal.integrated.showLinkHover',
 	IgnoreProcessNames = 'terminal.integrated.ignoreProcessNames',
 	AutoReplies = 'terminal.integrated.autoReplies',
+	InheritEnvOnRestore = 'terminal.integrated.inheritEnvOnRestore'
 }
 
 export enum WindowsShellType {
@@ -253,6 +254,7 @@ export interface IPtyService {
 		env: IProcessEnvironment,
 		executableEnv: IProcessEnvironment,
 		windowsEnableConpty: boolean,
+		inheritProcessEnv: string[],
 		shouldPersist: boolean,
 		workspaceId: string,
 		workspaceName: string
@@ -472,6 +474,11 @@ export interface IShellLaunchConfig {
 	 * Opt-out of the default terminal persistence on restart and reload
 	 */
 	disablePersistence?: boolean;
+
+	/**
+	 * Inherit instead of persisting these env variables
+	 */
+	inheritProcessEnv?: string[];
 }
 
 export interface ICreateContributedTerminalProfileOptions {

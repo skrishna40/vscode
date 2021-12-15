@@ -5,7 +5,7 @@
 
 import { ConfigurationScope, Extensions, IConfigurationNode, IConfigurationRegistry } from 'vs/platform/configuration/common/configurationRegistry';
 import { localize } from 'vs/nls';
-import { DEFAULT_LETTER_SPACING, DEFAULT_LINE_HEIGHT, TerminalCursorStyle, DEFAULT_COMMANDS_TO_SKIP_SHELL, SUGGESTIONS_FONT_WEIGHT, MINIMUM_FONT_WEIGHT, MAXIMUM_FONT_WEIGHT, DEFAULT_LOCAL_ECHO_EXCLUDE } from 'vs/workbench/contrib/terminal/common/terminal';
+import { DEFAULT_LETTER_SPACING, DEFAULT_LINE_HEIGHT, TerminalCursorStyle, DEFAULT_COMMANDS_TO_SKIP_SHELL, SUGGESTIONS_FONT_WEIGHT, MINIMUM_FONT_WEIGHT, MAXIMUM_FONT_WEIGHT, DEFAULT_LOCAL_ECHO_EXCLUDE, DEFAULT_INHERIT_ENV } from 'vs/workbench/contrib/terminal/common/terminal';
 import { TerminalLocationString, TerminalSettingId } from 'vs/platform/terminal/common/terminal';
 import { isMacintosh, isWindows } from 'vs/base/common/platform';
 import { Registry } from 'vs/platform/registry/common/platform';
@@ -514,7 +514,16 @@ const terminalConfiguration: IConfigurationNode = {
 			default: {
 				'Terminate batch job (Y/N)': 'Y\r'
 			}
-		}
+		},
+		[TerminalSettingId.InheritEnvOnRestore]: {
+			description: localize('terminal.integrated.inheritEnvOnRestore', "Instead of restoring these env variables, they will get inherited on restart"),
+			type: 'array',
+			items: {
+				type: 'string',
+				uniqueItems: true
+			},
+			default: DEFAULT_INHERIT_ENV
+		},
 	}
 };
 

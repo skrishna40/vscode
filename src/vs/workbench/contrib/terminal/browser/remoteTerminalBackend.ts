@@ -222,6 +222,7 @@ class RemoteTerminalBackend extends Disposable implements ITerminalBackend {
 		unicodeVersion: '6' | '11',
 		env: IProcessEnvironment, // TODO: This is ignored
 		windowsEnableConpty: boolean, // TODO: This is ignored
+		inheritProcessEnv: string[],
 		shouldPersist: boolean
 	): Promise<ITerminalChildProcess> {
 		if (!this._remoteTerminalChannel) {
@@ -250,7 +251,8 @@ class RemoteTerminalBackend extends Disposable implements ITerminalBackend {
 			'terminal.integrated.env.osx': this._configurationService.getValue(TerminalSettingId.EnvMacOs) as ITerminalEnvironment,
 			'terminal.integrated.env.linux': this._configurationService.getValue(TerminalSettingId.EnvLinux) as ITerminalEnvironment,
 			'terminal.integrated.cwd': this._configurationService.getValue(TerminalSettingId.Cwd) as string,
-			'terminal.integrated.detectLocale': terminalConfig.detectLocale
+			'terminal.integrated.detectLocale': terminalConfig.detectLocale,
+			'terminal.integrated.inheritProcessEnv': terminalConfig.inheritEnvOnRestore
 		};
 
 		const shellLaunchConfigDto: IShellLaunchConfigDto = {

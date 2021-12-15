@@ -109,7 +109,7 @@ export class PtyService extends Disposable implements IPtyService {
 						id: persistentProcessId,
 						shellLaunchConfig: persistentProcess.shellLaunchConfig,
 						processDetails: await this._buildProcessDetails(persistentProcessId, persistentProcess),
-						processLaunchOptions: persistentProcess.processLaunchOptions,
+						processLaunchOptions: this._adjustProcessEnv(persistentProcess.processLaunchOptions),
 						unicodeVersion: persistentProcess.unicodeVersion,
 						replayEvent: await persistentProcess.serializeNormalBuffer(),
 						timestamp: Date.now()
@@ -122,6 +122,21 @@ export class PtyService extends Disposable implements IPtyService {
 			state: await Promise.all(promises)
 		};
 		return JSON.stringify(serialized);
+	}
+
+	private _adjustProcessEnv(processLaunchOptions: IPersistentTerminalProcessLaunchOptions): IPersistentTerminalProcessLaunchOptions {
+		const env: IProcessEnvironment = processLaunchOptions.env;
+		if (!env) {
+			return processLaunchOptions;
+		}
+		const filteredEnv = Object.entries(env);
+		for (const [key,] of filteredEnv) {
+			if (processLaunchOptions.inheritProcessEnv.includes(key)) {
+				env[key] = undefined;
+				this._logService.trace('filtered out process env', key, env[key]);
+			}
+		}
+		return processLaunchOptions;
 	}
 
 	async reviveTerminalProcesses(state: string, dateTimeFormatLocate: string) {
@@ -157,6 +172,7 @@ export class PtyService extends Disposable implements IPtyService {
 				state.processLaunchOptions.env,
 				state.processLaunchOptions.executableEnv,
 				state.processLaunchOptions.windowsEnableConpty,
+				state.processLaunchOptions.inheritProcessEnv,
 				true,
 				state.processDetails.workspaceId,
 				state.processDetails.workspaceName,
@@ -166,6 +182,8 @@ export class PtyService extends Disposable implements IPtyService {
 			this._revivedPtyIdMap.set(state.id, { newId, state });
 		}
 	}
+
+
 
 	async shutdownAll(): Promise<void> {
 		this.dispose();
@@ -180,6 +198,7 @@ export class PtyService extends Disposable implements IPtyService {
 		env: IProcessEnvironment,
 		executableEnv: IProcessEnvironment,
 		windowsEnableConpty: boolean,
+		inheritProcessEnv: string[],
 		shouldPersist: boolean,
 		workspaceId: string,
 		workspaceName: string,
@@ -194,7 +213,8 @@ export class PtyService extends Disposable implements IPtyService {
 		const processLaunchOptions: IPersistentTerminalProcessLaunchOptions = {
 			env,
 			executableEnv,
-			windowsEnableConpty
+			windowsEnableConpty,
+			inheritProcessEnv
 		};
 		const persistentProcess = new PersistentTerminalProcess(id, process, workspaceId, workspaceName, shouldPersist, cols, rows, processLaunchOptions, unicodeVersion, this._reconnectConstants, this._logService, isReviving ? shellLaunchConfig.initialText : undefined, shellLaunchConfig.icon, shellLaunchConfig.color, shellLaunchConfig.name, shellLaunchConfig.fixedDimensions);
 		process.onDidChangeProperty(property => this._onDidChangeProperty.fire({ id, property }));
@@ -421,6 +441,7 @@ interface IPersistentTerminalProcessLaunchOptions {
 	env: IProcessEnvironment;
 	executableEnv: IProcessEnvironment;
 	windowsEnableConpty: boolean;
+	inheritProcessEnv: string[];
 }
 
 export class PersistentTerminalProcess extends Disposable {

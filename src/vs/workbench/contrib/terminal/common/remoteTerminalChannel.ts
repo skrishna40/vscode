@@ -39,6 +39,7 @@ export interface ICompleteTerminalConfiguration {
 	'terminal.integrated.env.linux': ITerminalEnvironment;
 	'terminal.integrated.cwd': string;
 	'terminal.integrated.detectLocale': 'auto' | 'off' | 'on';
+	'terminal.integrated.inheritProcessEnv': string[];
 }
 
 export type ITerminalEnvironmentVariableCollections = [string, ISerializableEnvironmentVariableCollection][];
@@ -63,7 +64,8 @@ export interface ICreateTerminalProcessArguments {
 	cols: number;
 	rows: number;
 	unicodeVersion: '6' | '11';
-	resolverEnv: { [key: string]: string | null; } | undefined
+	resolverEnv: { [key: string]: string | null; } | undefined;
+	inheritProcessEnv: string[];
 }
 
 export interface ICreateTerminalProcessResult {
@@ -186,7 +188,8 @@ export class RemoteTerminalChannelClient {
 			cols,
 			rows,
 			unicodeVersion,
-			resolverEnv
+			resolverEnv,
+			inheritProcessEnv: configuration['terminal.integrated.inheritProcessEnv']
 		};
 		return await this._channel.call<ICreateTerminalProcessResult>('$createProcess', args);
 	}
